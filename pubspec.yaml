@@ -56,6 +56,17 @@ dependencies:
   image_picker:
   flutter_screenutil:
   image_size_getter:
+  flutter_native_splash:
+  syncfusion_flutter_pdf:
+  permission_handler:
+  image_cropper: ^3.0.3
+
+flutter_native_splash:
+  color: "#ede3ca"
+  image: assets/images/palestine.png
+  fill: false
+  android: true
+  ios: true
 
 dev_dependencies:
   flutter_test:
