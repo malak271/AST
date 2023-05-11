@@ -5,7 +5,7 @@ var  cameras;
 
 String UPLOAD= "http://localhost:8000/api/upload";
 
-String? token;
+String? cookie;
 
 BoxDecoration DECORATION=BoxDecoration(
   color: Colors.white,

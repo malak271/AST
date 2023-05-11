@@ -2,6 +2,8 @@ import 'package:ast/screens/taking_picture_screen.dart' hide cameras;
 import 'package:ast/shared/components/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hexcolor/hexcolor.dart';
 import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
 import '../shared/components/components.dart';
@@ -13,138 +15,230 @@ class NewTest extends StatelessWidget {
 
 
   var formKey = GlobalKey<FormState>();
-  var idController = TextEditingController();
-  var items = [
-    'Item 1',
-    'Item 2',
-    'Item 3',
-    'Item 4',
-    'Item 5',
+  var bacteria = [
+    'b1',
+    'b2',
+    'b3',
+    'b4',
+    'b5',
+  ];
+  var sampleType = [
+    'blood',
+    'agar',
   ];
   final picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
+    var cubit=AppCubit.getCubit(context);
     return BlocConsumer<AppCubit, States>(
-        listener: (context, state) async {
-      if(state is UploadImgLoadingState){
-        print("========================================");
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
-
-              // AppCubit.getCubit(context).getCroppedImage(
-              //     img_name: state.astModel.cropsDetails![0].imgName!,
-              //     img_path: state.astModel.cropsDetails![0].imgFolder!);
-
-              return DisplayPictureScreen(
-              // Pass the automatically generated path to
-              // the DisplayPictureScreen widget.
-                imagePath: state.imagePath,
-              //   astModel:state.astModel
-            )
-              ;
-            }
-          ),
+        listener: (context, state) {
+      if(state is CreateTestSuccessState){
+        print("jkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+        Fluttertoast.showToast(
+          msg: "Insertion was successful",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
         );
+        cubit.cropImage(test_id: cubit.testId!);
+
+        navigateTo(context, DisplayPictureScreen());
+        // Navigator.pop(context);
       }
     },
-    builder:(context,state)=>Scaffold(
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.transparent,
-        elevation: 0,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () async{
-                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                if(pickedFile!=null)
-                AppCubit.getCubit(context).uploadImage(imagePath: pickedFile.path);
-              },
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.3,
-                child: Text("IMPORT"),
+    builder:(context,state){
+          return Scaffold(
+            // backgroundColor: HexColor("ede3ca"),
+            appBar: AppBar(
+              title: Text('New test'),
+              backgroundColor: HexColor('40A76A'),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Bacteria:'),
+                      SizedBox(height: 10,),
+                      DropdownButtonFormField<String>(
+                        menuMaxHeight: 100,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.all(4),
+                        ),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        elevation: 16,
+                        onChanged: (String? newValue) {
+                          cubit.sampleType=newValue;
+                        },
+                        items: sampleType.map<
+                            DropdownMenuItem<String>>((
+                            String value) {
+                          return DropdownMenuItem<String>(
+                            alignment: Alignment.centerLeft,
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+
+                      ),
+                      SizedBox(height: 20,),
+                      Text('Sample Type:'),
+                      SizedBox(height: 10,),
+                      DropdownButtonFormField<String>(
+                        decoration:  InputDecoration(
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.all(4),
+                        ),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        elevation: 16,
+                        onChanged: (String? newValue) {
+                          cubit.bacteria=newValue;
+                        },
+                        items: bacteria.map<
+                            DropdownMenuItem<String>>((
+                            String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(height: 20,),
+                      Divider(),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: HexColor('40A76A'),
+                              ),
+                              child: MaterialButton(
+                                onPressed: () async{
+                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                                  if(pickedFile!=null) {
+                                    cubit.image_path=pickedFile.path;
+                                    AppCubit.getCubit(context).createNewTest(
+                                        bacteria: cubit.bacteria!,
+                                        sample_type: cubit.sampleType!,
+                                        imagePath: pickedFile.path);
+                                  } },
+                                child: Text(
+                                  "IMPORT",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: HexColor('40A76A'),
+                              ),
+                              child: MaterialButton(
+                                onPressed: () {
+                                  navigateTo(context, TakePictureScreen(camera: cameras.first ,));
+                                },
+                                child: Text(
+                                  "NEXT",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
               ),
             ),
-            SizedBox(
-              width: 10,
-            ),
-            ElevatedButton(
-              onPressed: () {
-                navigateTo(context, TakePictureScreen(camera: cameras.first ,));
-              },
-              child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  child: Text("NEXT")),
-            ),
-          ],
-        ),
-      ),
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'New Test',
-                    style: Theme.of(context).textTheme.headline5,
+          );
+    });
+  }
+}
+
+/*
+* DropdownButton<String>(
+                          isExpanded: true,
+                          items: bacteria.map((String item) {
+                            return DropdownMenuItem(
+                              value: item,
+                              child: Text(item),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            cubit.bacteria=newValue;
+                          },
+                        ),
+                        DropdownButton<String>(
+                          isExpanded: true,
+                          items: sampleType.map((String item) {
+                            return DropdownMenuItem(
+                              value: item,
+                              child: Text(item),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            cubit.sampleType=newValue;
+                          },
+                        ),
+                        *
+                        *
+                        *             bottomNavigationBar: BottomAppBar(
+              color: Colors.transparent,
+              elevation: 0,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  ElevatedButton(
+                    style: ButtonStyle(
+                    ),
+                    onPressed: () async{
+                      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                      if(pickedFile!=null) {
+                        cubit.image_path=pickedFile.path;
+                        AppCubit.getCubit(context).createNewTest(
+                            bacteria: cubit.bacteria!,
+                            sample_type: cubit.sampleType!,
+                            imagePath: pickedFile.path);
+                      } },
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      child: Text("IMPORT"),
+                    ),
                   ),
                   SizedBox(
-                    height: 20,
+                    width: 10,
                   ),
-                  DefaultTextFormField(
-                    controller: idController,
-                    type: TextInputType.text,
-                    validator: (String? value) {
-                      if ((value ?? '').isEmpty) {
-                        return 'id must not be empty';
-                      }
+                  ElevatedButton(
+                    onPressed: () {
+                      navigateTo(context, TakePictureScreen(camera: cameras.first ,));
                     },
-                    text: 'AST ID',
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    items: items.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {},
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    items: items.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {},
-                  ),
-                  DropdownButton<String>(
-                    isExpanded: true,
-                    items: items.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {},
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        child: Text("NEXT")),
                   ),
                 ],
               ),
             ),
-          ),
-        ),
-      ),
-    ));
-  }
-}
+
+* */

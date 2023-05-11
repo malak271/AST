@@ -1,7 +1,10 @@
 import 'package:ast/screens/add_new_test_screen.dart';
 import 'package:ast/shared/ast_cubit/cubit.dart';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hexcolor/hexcolor.dart';
+import '../models/user_tests_model.dart';
 import '../shared/ast_cubit/states.dart';
 import '../shared/components/components.dart';
 
@@ -9,37 +12,48 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var cubit=AppCubit.getCubit(context);
+    cubit.getUserTests();
     return Scaffold(
+        backgroundColor: HexColor("ede3ca"),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           navigateTo(context,NewTest());
         },
         icon: const Icon(Icons.edit),
         label: const Text('New Test'),
+        backgroundColor: HexColor('40A76A'),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
+        backgroundColor: HexColor('40A76A'),
         titleSpacing: 0,
-        toolbarHeight: 150,
-        title:Image(
-          image: AssetImage('assets/images/background2.jpg'),
-          fit: BoxFit.cover,
-        ),
+        title: Text('My Tests:'),
+        leading: Icon(Icons.arrow_back_ios_outlined),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: BlocConsumer<AppCubit, States>(
-            builder: (context, state) {
-              return itemBuilder(context);
+      body: BlocConsumer<AppCubit, States>(
+        listener: (context,state)=>{},
+        builder: (context,state) {
+          // var cubit = AppCubit.getCubit(context);
+          return ConditionalBuilder(
+            builder: (BuildContext context) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: itemBuilder(context,cubit),
+              );
             },
-            listener: (context, state) {
+            condition: state is GetTestsSuccessState,
+            fallback: (BuildContext context) =>Center(child: CircularProgressIndicator()),
 
-            }),
-      ),
+          );
+        }
+
+        ,
+      )
     );
   }
 
-  Widget itemBuilder(context) => SingleChildScrollView(
+  Widget itemBuilder(context,AppCubit cubit) => SingleChildScrollView(
     physics: BouncingScrollPhysics(),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -47,64 +61,65 @@ class HomeScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            child: ListView.separated(
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context,index)=>buildCardItem(),
-                separatorBuilder: (context,index)=>
-                    SizedBox(height: 10,),
-                itemCount: 20),
-          ),
+          ListView.separated(
+              shrinkWrap: true,
+              physics: BouncingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context,index)=>buildCardItem(cubit.userTests!.data![index]),
+              separatorBuilder: (context,index)=>
+                  SizedBox(height: 10,),
+              itemCount: cubit.userTests!.testsCount??0),
           SizedBox(height: 20,),
         ],
       ),
     ),
   );
 
-  Widget buildCardItem()=>Container(
-    padding: EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(30), //border corner radius
-      boxShadow:[
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.1), //color of shadow
-          spreadRadius: 5, //spread radius
-          blurRadius: 7, // blur radius
-          offset: Offset(0, 2), // changes position of shadow
-          //first paramerter of offset is left-right
-          //second parameter is top to down
-        ),
-      ],
+  Widget buildCardItem(Data test)=>GestureDetector (
+    child: Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow:[
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Sample type: ${test.sampleType}',
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+            ),
+          ),
+          Text('Bacteria: ${test.bacteria}',
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+            ),
+          ),
+          Text('Created at: ${test.createdAt}',
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+            ),
+          ),
+        ],
+      ),
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('AST ID: 1',
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-          ),
-        ),
-        Text('klessiblia',
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-          ),
-        ),
-        Text('By: user',
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-          ),
-        ),
-      ],
-    ),
+    onTap: (){
+      //open result page
+    },
   );
 
 }

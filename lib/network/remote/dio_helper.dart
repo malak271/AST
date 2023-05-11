@@ -1,15 +1,17 @@
 import 'dart:io';
 
+import 'package:ast/shared/components/Constants.dart';
 import 'package:dio/dio.dart';
 
 class DioHelper {
 
   static  Dio dio = Dio(BaseOptions(
-      baseUrl: 'http://192.168.1.112:5000/',
+      baseUrl: 'http://192.168.1.105:5000/',
       receiveDataWhenStatusError: true,
       headers:
       {
         'Content-Type':'application/json',
+        'cookie':cookie
       },
     followRedirects: false,
     maxRedirects: 5, // adjust this to suit your needs
@@ -31,6 +33,7 @@ class DioHelper {
     try{
       dio.options.headers= {
         'Content-Type':'application/json',
+        'cookie':cookie
       };
       Response data= await dio.get(url,queryParameters: query ?? null,);
       onSuccess(data);
@@ -59,6 +62,7 @@ class DioHelper {
   }) async {
     dio.options.headers= {
       'Content-Type':'application/json',
+      'cookie':cookie
     };
     dio.options.followRedirects=false;
     dio.options.maxRedirects=5;
@@ -69,22 +73,17 @@ class DioHelper {
     try {
       //formdata
       var formData = FormData.fromMap(data);
-
       Response response = await dio.post(url, data: formData ,options:options );
-
-      print(response.data);
-
       //raw
       // print('url post : $url');
       // Response response = await dio.post(url,queryParameters: query,data: data);
-
       onSuccess(response);
 
     }on DioError catch(error){
       onError(ApIError(error.message,error.response));
     }on SocketException catch(error){
       print(error.message.toString());
-      onError(ApIError('لا يوجد اتصال بالانترنت :(',null));
+      onError(ApIError('no internet connection',null));
     }catch(error){
       onError(ApIError(error.toString(),null));
     }
@@ -102,6 +101,7 @@ class DioHelper {
   }) async {
     dio.options.headers= {
       'Content-Type':'application/json',
+      'cookie':cookie
     };
     try {
       // var formData = FormData.fromMap(data!);

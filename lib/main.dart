@@ -1,51 +1,48 @@
 import 'dart:io';
 import 'package:ast/screens/home_screen.dart';
+import 'package:ast/screens/login_screen.dart';
 import 'package:ast/shared/ast_cubit/cubit.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
 import 'package:ast/shared/components/Constants.dart';
 import 'package:ast/shared/observer.dart';
-import 'package:ast/styles/theme.dart';
 import 'package:bloc/bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'network/local/chache_helper.dart';
 
 void main() async{
   HttpOverrides.global = MyHttpOverrides();
-  WidgetsFlutterBinding.ensureInitialized();
+
+  var ensureInitialized = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: ensureInitialized);
 
   cameras =await availableCameras();
+  await CacheHelper.init();
+  // cookie=CacheHelper.getData(key:'cookie');
+  // bool? isBoarding = CacheHelper.getData(key: 'onBoarding');
 
-  // await CacheHelper.init();
-  // bool? GroceriesIsBoarding = CacheHelper.getData(key: 'GroceriesOnBoarding');
-  //
-  // await MyHive.init();
-  //
-  // if(await Hive.boxExists(MyHive.loginModelKey)){
-  //   await MyHive.openBox(
-  //     name: MyHive.loginModelKey,
-  //   );
-  //   LoginModel model= await MyHive.getValue('UserInfo');
-  //   token=model.token;
-  //   print('finally! $token');
-  // }
-
-  // Widget? widget;
-  //
-  // if(GroceriesIsBoarding != null){
-  //   if(token != null)
-  //     widget=HomeLayout();
-  //   else {
-  //     print('token equal null!');
-  //     widget = GroceriesLoginScreen();
+  Widget? widget;
+  widget=LoginScreen();
+  // if(isBoarding != null){
+  //   if(cookie != null){
+  //     widget=HomeScreen();
+  //   }else{
+  //     widget=LoginScreen();
   //   }
-  // }else{
-  //   widget = GroceriesOnBoarding();
   // }
+  // else{
+  //   OnBoarding();
+  // }
+
 
   Bloc.observer = MyBlocObserver();
-  runApp( MyApp(startWidget: HomeScreen()));
+
+  FlutterNativeSplash.remove();
+  runApp( MyApp(startWidget: widget));
 
 }
 

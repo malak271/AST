@@ -23,7 +23,7 @@ Widget DefaultButton({
           text.toUpperCase(),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -71,6 +71,7 @@ void navigateTo(context, widget) {
         builder: (context) => widget,
       ));
 }
+
 
 void navigateAndFinish(context, widget) {
   Navigator.pushAndRemoveUntil(
