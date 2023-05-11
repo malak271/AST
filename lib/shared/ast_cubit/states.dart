@@ -8,37 +8,57 @@ abstract class States {}
 
 class InitialState extends States {}
 
-class UploadImgLoadingState extends States{
-  // final List<ASTModel> astModel;
-  final String imagePath;
-  UploadImgLoadingState(this.imagePath);
-}
+class GetTestsLoadingState extends States{}
 
-class UploadImgSuccessState extends States{
-  final ASTModel astModel;
-  final String imagePath;
-  UploadImgSuccessState(this.astModel,this.imagePath);
-}
+class GetTestsSuccessState extends States{}
 
-class UploadImgErrorState extends States{ //state 2
+class GetTestsErrorState extends States{ //state 2
   final error;
-  UploadImgErrorState(this.error);
+  GetTestsErrorState(this.error);
 }
 
-class ChangePageViewIndexState extends States{}
+class CreateTestLoadingState extends States{}
 
-class GetImgLoadingState extends States{
-  // final List<ASTModel> astModel;
-  // final String imagePath;
-  // UploadImgLoadingState(this.astModel,this.imagePath);
+class CreateTestSuccessState extends States{}
+
+class CreateTestErrorState extends States{ //state 2
+  final error;
+  CreateTestErrorState(this.error);
 }
 
-class GetImgSuccessState extends States{
-  final Uint8List croppedImg;
-  GetImgSuccessState(this.croppedImg);
+class CropImageLoadingState extends States{}
+
+class CropImageSuccessState extends States{}
+
+class CropImageErrorState extends States{ //state 2
+  final error;
+  CropImageErrorState(this.error);
 }
+
+class GetImgLoadingState extends States{}
+
+class GetImgSuccessState extends States{}
 
 class GetImgErrorState extends States{ //state 2
   final error;
   GetImgErrorState(this.error);
 }
+
+class NextState extends States{
+  final int index;
+  NextState(this.index);
+}
+
+class SendAdjLoadingState extends States{}
+
+class SendAdjSuccessState extends States{}
+
+class SendAdjErrorState extends States{ //state 2
+  final error;
+  SendAdjErrorState(this.error);
+}
+
+class NoAdjChangedState extends States{}
+
+class ChangePageViewIndexState extends States{}
+
