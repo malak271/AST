@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'package:ast/models/ast_model.dart';
-import 'package:ast/screens/test_result_screen.dart';
+import 'package:ast/screens/draw_result_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 import '../shared/ast_cubit/cubit.dart';
@@ -17,17 +15,6 @@ class DisplayPictureScreen extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
   var labelController = TextEditingController();
   var inhibitionController = TextEditingController();
-  List<String> preLabels = <String>[
-    'Cefepime/clavulanic acid FEC 40',
-    'Cefixime CFM 10',
-    'Cefditoren CDN 15',
-    'Cefmetazole CMZ 20',
-    'Cefepime/clavulanic acid FEC 50',
-    'Cefixime CFM 20',
-    'Cefditoren CDN 51',
-    'Cefmetazole CMZ 30'
-  ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +114,8 @@ class DisplayPictureScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              if (cubit.numOfCrops==0 )
-                Center(child: Text("num of crops = 0"))
+              // if (cubit.numOfCrops==0 )
+              //   Center(child: Text("num of crops = 0"))
             ],
           ));
     });
@@ -251,8 +238,9 @@ class DisplayPictureScreen extends StatelessWidget {
                 Expanded(
                   child: DefaultButton(
                       function: () {
-                        navigateTo(context, TestResultScreen());
-                        cubit.sendUserAdjustments();
+                        cubit.drawImage(test_id: cubit.testId!);
+                        navigateTo(context, DrawResultScreen());
+                        // cubit.sendUserAdjustments();
                       },
                       text: 'Next'),
                 ),
@@ -355,20 +343,16 @@ class DisplayPictureScreen extends StatelessWidget {
     print(index);
     Size size = ImageSizeGetter.getSize(
         MemoryInput(cubit.images_info[index].img!));
+
     double xScale = ((size.width) /
         (cubit.images_info[index].width!));
+
     double yScale = ((size.height) /
         (cubit.images_info[index].height!));
 
-    cubit.diameters.add(((cubit
-        .images_info[index].inhibitionRadius!) *
-        (xScale + yScale) /
-        2));
+    double rScale= (xScale + yScale) / 2;
 
-    cubit.labels.add(cubit.images_info[index].label!);
-
-
-    preLabels[index]=(cubit.images_info[index].label!);
+    double radius=cubit.images_info[index].inhibitionRadius! * rScale;
 
     return Column(
         children: [
@@ -386,7 +370,7 @@ class DisplayPictureScreen extends StatelessWidget {
                     y: (cubit.images_info[index]
                         .centerY!) *
                         yScale,
-                    radius: cubit.diameters[index]
+                    radius: radius
                 ),
               ),
             ],
@@ -404,13 +388,13 @@ class DisplayPictureScreen extends StatelessWidget {
               border: UnderlineInputBorder(),
               contentPadding: EdgeInsets.all(4),
             ),
-            value: cubit.labels[index],
+            value: cubit.images_info[index].label,
             icon: const Icon(Icons.arrow_drop_down),
             elevation: 16,
             onChanged: (String? value) {
               cubit.changeLabel(index, value);
             },
-            items: preLabels.map<DropdownMenuItem<String>>(
+            items: cubit.preLabels.map<DropdownMenuItem<String>>(
                     (String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -423,7 +407,7 @@ class DisplayPictureScreen extends StatelessWidget {
           ),
           Slider(
             activeColor:  HexColor('40A76A'),
-            value: cubit.diameters[index],
+            value: radius,
             min: 0.0,
             max: cubit.images_info[index].width ?? 0,
             onChanged: (value) {
