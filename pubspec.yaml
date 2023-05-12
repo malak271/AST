@@ -63,7 +63,7 @@ dependencies:
 
 flutter_native_splash:
   color: "#ede3ca"
-  image: assets/images/palestine.png
+  image: assets/images/logo1.png
   fill: false
   android: true
   ios: true
