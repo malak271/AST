@@ -12,8 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'display_picture_screen.dart';
 
 class NewTest extends StatelessWidget {
-
-
   var formKey = GlobalKey<FormState>();
   var bacteria = [
     'b1',
@@ -30,11 +28,9 @@ class NewTest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cubit=AppCubit.getCubit(context);
-    return BlocConsumer<AppCubit, States>(
-        listener: (context, state) {
-      if(state is CreateTestSuccessState){
-        print("jkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+    var cubit = AppCubit.getCubit(context);
+    return BlocConsumer<AppCubit, States>(listener: (context, state) {
+      if (state is CreateTestSuccessState) {
         Fluttertoast.showToast(
           msg: "Insertion was successful",
           toastLength: Toast.LENGTH_LONG,
@@ -49,128 +45,151 @@ class NewTest extends StatelessWidget {
         navigateTo(context, DisplayPictureScreen());
         // Navigator.pop(context);
       }
-    },
-    builder:(context,state){
-          return Scaffold(
-            // backgroundColor: HexColor("ede3ca"),
-            appBar: AppBar(
-              title: Text('New test'),
-              backgroundColor: HexColor('40A76A'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    }, builder: (context, state) {
+      return Scaffold(
+        // backgroundColor: HexColor("ede3ca"),
+        appBar: AppBar(
+          title: Text('New test'),
+          backgroundColor: HexColor('40A76A'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Sample Type:'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<String>(
+                    menuMaxHeight: 100,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(4),
+                    ),
+                    icon: const Icon(Icons.arrow_drop_down),
+                    elevation: 16,
+                    onChanged: (String? newValue) {
+                      cubit.sampleType = newValue;
+                    },
+                    items: sampleType
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        alignment: Alignment.centerLeft,
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    validator: (String? value) {
+                      if ((value ?? '').isEmpty) {
+                        return 'sample type must not be empty';
+                      }
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text('Bacteria:'),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.all(4),
+                    ),
+                    icon: const Icon(Icons.arrow_drop_down),
+                    elevation: 16,
+                    onChanged: (String? newValue) {
+                      cubit.bacteria = newValue;
+                    },
+                    items:
+                        bacteria.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    validator: (String? value) {
+                      if ((value ?? '').isEmpty) {
+                        return 'bacteria must not be empty';
+                      }
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Divider(),
+                  Row(
                     children: [
-                      Text('Bacteria:'),
-                      SizedBox(height: 10,),
-                      DropdownButtonFormField<String>(
-                        menuMaxHeight: 100,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.all(4),
-                        ),
-                        icon: const Icon(Icons.arrow_drop_down),
-                        elevation: 16,
-                        onChanged: (String? newValue) {
-                          cubit.sampleType=newValue;
-                        },
-                        items: sampleType.map<
-                            DropdownMenuItem<String>>((
-                            String value) {
-                          return DropdownMenuItem<String>(
-                            alignment: Alignment.centerLeft,
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-
-                      ),
-                      SizedBox(height: 20,),
-                      Text('Sample Type:'),
-                      SizedBox(height: 10,),
-                      DropdownButtonFormField<String>(
-                        decoration:  InputDecoration(
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.all(4),
-                        ),
-                        icon: const Icon(Icons.arrow_drop_down),
-                        elevation: 16,
-                        onChanged: (String? newValue) {
-                          cubit.bacteria=newValue;
-                        },
-                        items: bacteria.map<
-                            DropdownMenuItem<String>>((
-                            String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(height: 20,),
-                      Divider(),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: HexColor('40A76A'),
-                              ),
-                              child: MaterialButton(
-                                onPressed: () async{
-                                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                                  if(pickedFile!=null) {
-                                    cubit.image_path=pickedFile.path;
-                                    AppCubit.getCubit(context).createNewTest(
-                                        bacteria: cubit.bacteria!,
-                                        sample_type: cubit.sampleType!,
-                                        imagePath: pickedFile.path);
-                                  } },
-                                child: Text(
-                                  "IMPORT",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: HexColor('40A76A'),
+                          ),
+                          child: MaterialButton(
+                            onPressed: () async {
+                              if (formKey.currentState!.validate()) {
+                                final pickedFile = await picker.pickImage(
+                                    source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  cubit.image_path = pickedFile.path;
+                                  AppCubit.getCubit(context).createNewTest(
+                                      bacteria: cubit.bacteria!,
+                                      sample_type: cubit.sampleType!,
+                                      imagePath: pickedFile.path);
+                                }
+                              }
+                            },
+                            child: Text(
+                              "IMPORT",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: HexColor('40A76A'),
-                              ),
-                              child: MaterialButton(
-                                onPressed: () {
-                                  navigateTo(context, TakePictureScreen(camera: cameras.first ,));
-                                },
-                                child: Text(
-                                  "NEXT",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            color: HexColor('40A76A'),
+                          ),
+                          child: MaterialButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate())
+                                navigateTo(
+                                    context,
+                                    TakePictureScreen(
+                                      camera: cameras.first,
+                                    ));
+                            },
+                            child: Text(
+                              "NEXT",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          )
-                        ],
+                          ),
+                        ),
                       )
                     ],
-                  ),
-                ),
+                  )
+                ],
               ),
             ),
-          );
+          ),
+        ),
+      );
     });
   }
 }
