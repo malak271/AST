@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:ast/screens/home_screen.dart';
 import 'package:ast/screens/login_screen.dart';
 import 'package:ast/shared/ast_cubit/cubit.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
@@ -14,11 +13,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'network/local/chache_helper.dart';
 
 void main() async{
+
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
+
   HttpOverrides.global = MyHttpOverrides();
-
-  var ensureInitialized = WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterNativeSplash.preserve(widgetsBinding: ensureInitialized);
 
   cameras =await availableCameras();
   await CacheHelper.init();
@@ -41,9 +40,8 @@ void main() async{
 
   Bloc.observer = MyBlocObserver();
 
-  FlutterNativeSplash.remove();
   runApp( MyApp(startWidget: widget));
-
+  FlutterNativeSplash.remove();
 }
 
 
