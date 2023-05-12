@@ -1,8 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:ast/models/ast_model.dart';
-import 'package:flutter/material.dart';
 
 abstract class States {}
 
@@ -62,3 +58,11 @@ class NoAdjChangedState extends States{}
 
 class ChangePageViewIndexState extends States{}
 
+class DrawImageLoadingState extends States{}
+
+class DrawImageSuccessState extends States{}
+
+class DrawImageErrorState extends States{ 
+  final error;
+  DrawImageErrorState(this.error);
+}
