@@ -10,8 +10,7 @@ class ASTModel {
   double? width;
   double? height;
   Uint8List? img;
-  String? new_label;
-  double? new_inhibitionRadius;
+  String? result;
 
   ASTModel(
       {this.imgId,
@@ -22,7 +21,8 @@ class ASTModel {
         this.centerY,
         this.width,
         this.height,
-        this.img});
+        this.img,
+      });
 
   ASTModel.fromJson(Map<String, dynamic> json) {
     imgId = json['img_id'];
