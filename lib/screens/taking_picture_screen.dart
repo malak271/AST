@@ -9,7 +9,6 @@ import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
 import '../shared/components/Constants.dart';
 
-
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
     super.key,
@@ -27,7 +26,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   bool showFocusCircle = false;
   double x = 0;
   double y = 0;
-  String text='line up the petri dish so that its edges touch the frame';
+  String text = 'line up the petri dish so that its edges touch the frame';
 
   @override
   void initState() {
@@ -88,6 +87,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             // }
           },
           builder: (context, state) => Scaffold(
+            backgroundColor: Colors.black,
             body: Stack(
               children: [
                 Center(child: CameraPreview(controller)),
@@ -103,27 +103,25 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             border:
                                 Border.all(color: Colors.white, width: 1.5)),
                       )),
-                Positioned.fill(
+                  Positioned.fill(
                     child: Align(
                         alignment: Alignment.center,
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 2,
-                              color: Colors.white
-                            ),
+                            border: Border.all(width: 2, color: Colors.white),
                           ),
                           alignment: Alignment.center,
                           width: 375,
                           height: 400,
-                          child:
-                          Container(
+                          child: Container(
                             height: 80,
                             color: Colors.black.withOpacity(.5),
                             alignment: Alignment.center,
                             child: Text(
                               text,
-                              style: TextStyle(color: Colors.white,),
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -136,7 +134,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               // Provide an onPressed callback.
               onPressed: () async {
                 setState(() {
-                  text="Taking photo...";
+                  text = "Taking photo...";
                 });
                 // Take the Picture in a try / catch block. If anything goes wrong,
                 // catch the error.
@@ -148,44 +146,33 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   // where it was saved.
                   final image = await controller.takePicture();
 
-print("4444444444444444");
-try{
-                  CroppedFile? croppedFile = await ImageCropper().cropImage(
-                      sourcePath: image.path,
-                      aspectRatioPresets: [
-                        CropAspectRatioPreset.square,
-                        CropAspectRatioPreset.ratio3x2,
-                        CropAspectRatioPreset.original,
-                        CropAspectRatioPreset.ratio4x3,
-                        CropAspectRatioPreset.ratio16x9
-                      ],
-                      uiSettings:[
-                        AndroidUiSettings(
-                          toolbarTitle: 'Cropper',
-                          toolbarColor: Colors.deepOrange,
-                          toolbarWidgetColor: Colors.white,
-                          initAspectRatio: CropAspectRatioPreset.original,
-                          lockAspectRatio: false),
-                        IOSUiSettings(
-                        minimumAspectRatio: 1.0,
-                      )
-                       ]
-                  );
-                     cubit.image_path = croppedFile!.path;
-                  AppCubit.getCubit(context).createNewTest(
-                      bacteria: cubit.bacteria!,
-                      sample_type: cubit.sampleType!,
-                      imagePath: image.path);
+                    CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path);
+print(croppedFile!.path);
+                    //     .cropImage(sourcePath: image.path, aspectRatioPresets: [
+                    //   CropAspectRatioPreset.square,
+                    //   CropAspectRatioPreset.ratio3x2,
+                    //   CropAspectRatioPreset.original,
+                    //   CropAspectRatioPreset.ratio4x3,
+                    //   CropAspectRatioPreset.ratio16x9
+                    // ], uiSettings: [
+                    //   AndroidUiSettings(
+                    //       toolbarTitle: 'Cropper',
+                    //       toolbarColor: Colors.deepOrange,
+                    //       toolbarWidgetColor: Colors.white,
+                    //       initAspectRatio: CropAspectRatioPreset.original,
+                    //       lockAspectRatio: false),
+                    //   IOSUiSettings(
+                    //     minimumAspectRatio: 1.0,
+                    //   )
+                    // ]);
 
-}catch(error){
-  print(error);
-}
-print("55555555555555555");
+                    cubit.image_path = image.path;
+                    AppCubit.getCubit(context).createNewTest(
+                        bacteria: cubit.bacteria!,
+                        sample_type: cubit.sampleType!,
+                        imagePath: image.path);
 
                   if (!mounted) return;
-
-               
-
                 } catch (e) {
                   // If an error occurs, log the error to the console.
                   print(e);
@@ -227,5 +214,4 @@ print("55555555555555555");
       });
     }
   }
-
 }

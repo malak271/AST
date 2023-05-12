@@ -1,11 +1,9 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../../../shared/components/components.dart';
-import '../shared/ast_cubit/cubit.dart';
 import '../shared/register_cubit/register_cubit.dart';
 import '../shared/register_cubit/register_states.dart';
 import 'login_screen.dart';
@@ -43,6 +41,8 @@ class RegisterScreen extends StatelessWidget {
       }, builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
+            title: const Text('Register'),
+            backgroundColor: HexColor('40A76A'),
           ),
           body: Padding(
             padding: const EdgeInsets.all(25.0),
