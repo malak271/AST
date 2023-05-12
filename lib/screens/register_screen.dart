@@ -25,6 +25,15 @@ class RegisterScreen extends StatelessWidget {
       child: BlocConsumer<RegisterCubit, RegisterStates>(
           listener: (context, state) async {
         if (state is RegisterSuccessState) {
+          Fluttertoast.showToast(
+            msg: 'account created successfully',
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 5,
+            fontSize: 16,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
           navigateAndFinish(context, LoginScreen());
         } else if (state is RegisterErrorState) {
           Fluttertoast.showToast(
