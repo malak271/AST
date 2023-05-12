@@ -27,7 +27,6 @@ class DrawResultScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // CircularProgressIndicator(),
                     if (state is DrawImageLoadingState)
                       const CircularProgressIndicator(),
                     if (cubit.drawResultImg!=null)
@@ -49,9 +48,9 @@ class DrawResultScreen extends StatelessWidget {
                   Expanded(
                     child: DefaultButton(
                         function: () {
-                          navigateTo(context, TestResultScreen());
+                          Navigator.pop(context);
                         },
-                        text: 'NEXT'),
+                        text: 'BACK'),
                   ),
                   const SizedBox(
                     width: 10,
@@ -59,9 +58,10 @@ class DrawResultScreen extends StatelessWidget {
                   Expanded(
                     child: DefaultButton(
                         function: () {
-                          Navigator.pop(context);
+                          cubit.sendResults();
+                          navigateTo(context, TestResultScreen());
                         },
-                        text: 'BACK'),
+                        text: 'NEXT'),
                   ),
                 ],
               ),
