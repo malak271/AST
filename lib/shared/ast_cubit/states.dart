@@ -66,3 +66,12 @@ class DrawImageErrorState extends States{
   final error;
   DrawImageErrorState(this.error);
 }
+
+class SendResultsLoadingState extends States{}
+
+class SendResultsSuccessState extends States{}
+
+class SendResultsErrorState extends States{
+  final error;
+  SendResultsErrorState(this.error);
+}

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:ast/models/adjustments_model.dart';
 import 'package:ast/models/ast_model.dart';
 import 'package:ast/models/user_tests_model.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
@@ -40,7 +41,19 @@ class AppCubit extends Cubit<States> {
     required String imagePath,
   }) async{
     testId=0;
-    // image_path=image_path;
+    drawResultImg=null;
+    images_info.clear();
+    numOfCrops=0;
+    preLabels.clear();
+    List<String> c=['Cefepime/clavulanic acid FEC 40',
+      'Cefixime CFM 10',
+      'Cefditoren CDN 15',
+      'Cefmetazole CMZ 20',
+      'Cefepime/clavulanic acid FEC 50',
+      'Cefixime CFM 20',
+      'Cefditoren CDN 51',
+      'Cefmetazole CMZ 30'];
+    preLabels.addAll(c);
     emit(CreateTestLoadingState());
     DioHelper.postData(
         url: 'test/create',
@@ -67,18 +80,6 @@ class AppCubit extends Cubit<States> {
   void cropImage ({
     required int test_id,
   }) {
-    images_info.clear();
-    numOfCrops=0;
-    preLabels.clear();
-    List<String> c=['Cefepime/clavulanic acid FEC 40',
-      'Cefixime CFM 10',
-      'Cefditoren CDN 15',
-      'Cefmetazole CMZ 20',
-      'Cefepime/clavulanic acid FEC 50',
-      'Cefixime CFM 20',
-      'Cefditoren CDN 51',
-      'Cefmetazole CMZ 30'];
-    preLabels.addAll(c);
     emit(CropImageLoadingState());
     DioHelper.postData(
         url: 'process/crops',
@@ -130,6 +131,7 @@ class AppCubit extends Cubit<States> {
             if(response.headers.value("atb-data") != null){
               Map<String, dynamic> data=json.decode(response.headers.value("atb-data")!);
               data['img']=croppedImg;
+
               images_info.add(ASTModel.fromJson(data));
               preLabels.add(data['label']);
               if(images_info.length != images_id.length) {
@@ -146,46 +148,51 @@ class AppCubit extends Cubit<States> {
         });
   }
 
- List<Map<String, dynamic>> adjustments=[];
+ // List<Map<String, dynamic>> adjustments=[];
 
- sendUserAdjustments () {
+ // sendUserAdjustments () {
+ //
+ //   // print(labels);
+ //   // print(diameters);
+ //   // print(adjustments);
+ //
+ //
+ //    if(adjustments.isNotEmpty) {
+ //      emit(SendAdjLoadingState());
+ //      DioHelper.postData(
+ //          options: Options(responseType: ResponseType.bytes),
+ //          url: 'test/confirmation',
+ //          data: {
+ //            'test_id': testId.toString(),
+ //            'image_info': adjustments,
+ //          },
+ //          onError: (ApIError) {
+ //            print(ApIError.message);
+ //            emit(SendAdjErrorState(ApIError.message));
+ //          },
+ //          onSuccess: (response) {
+ //            print(response.data);
+ //            emit(SendAdjSuccessState());
+ //            // if (response.data['Status'] == "Success") {
+ //            //   emit(SendAdjSuccessState());
+ //            // }
+ //            // else
+ //            //   emit(SendAdjErrorState("TRY AGAIN"));
+ //          });
+ //    }else{
+ //      emit(NoAdjChangedState());
+ //    }
+ //  }
 
-   // print(labels);
-   // print(diameters);
-   // print(adjustments);
-
-
-    if(adjustments.isNotEmpty) {
-      emit(SendAdjLoadingState());
-      DioHelper.postData(
-          options: Options(responseType: ResponseType.bytes),
-          url: 'test/confirmation',
-          data: {
-            'test_id': testId.toString(),
-            'image_info': adjustments,
-          },
-          onError: (ApIError) {
-            print(ApIError.message);
-            emit(SendAdjErrorState(ApIError.message));
-          },
-          onSuccess: (response) {
-            print(response.data);
-            emit(SendAdjSuccessState());
-            // if (response.data['Status'] == "Success") {
-            //   emit(SendAdjSuccessState());
-            // }
-            // else
-            //   emit(SendAdjErrorState("TRY AGAIN"));
-          });
-    }else{
-      emit(NoAdjChangedState());
-    }
-  }
-
-  String interprateResults(int img_id){
-    if(img_id>415)
-      return "S";
-    return "R";
+  interpretResults(){
+    images_info.forEach((element) {
+      var result='R';
+      if(element.inhibitionRadius! > 60)
+        result='S';
+      element.result=result;
+      ResultModel model=ResultModel(img_id:element.imgId,result:element.result);
+      results.add(model.toJson());
+    });
   }
 
   PageController controller = PageController(initialPage: 0);
@@ -235,27 +242,56 @@ class AppCubit extends Cubit<States> {
   void drawImage ({
     required int test_id,
   }) {
+   if(drawResultImg != null) emit(DrawImageSuccessState());
+   else {
+     emit(DrawImageLoadingState());
+     DioHelper.postData(
+       url: 'fetch/draw',
+       data: {
+         'test_id': '$test_id',
+       },
+       onSuccess: (response) {
+         var imageBytes = base64Decode(response.data);
 
-    emit(DrawImageLoadingState());
-    DioHelper.postData(
-        url: 'fetch/draw',
-        data: {
-          'test_id': '$test_id',
-        },
-        onSuccess: (response)  {
-          var imageBytes = base64Decode(response.data);
-          if(imageBytes.isNotEmpty){
-            drawResultImg=imageBytes;
-            emit(DrawImageSuccessState());
-          }else
-            emit(DrawImageErrorState('The image id you provided doesn\'t match any stored image id'));
-        } ,
-      onError: (ApIError) {
-      print(ApIError.message);
-      emit(DrawImageErrorState(ApIError.message));
-    },);
+         // Uint8List imageBytes = Uint8List.fromList(response.data);
+
+         if (imageBytes.isNotEmpty) {
+           drawResultImg = imageBytes;
+           emit(DrawImageSuccessState());
+         } else
+           emit(DrawImageErrorState(
+               'The image id you provided doesn\'t match any stored image id'));
+       },
+       onError: (ApIError) {
+         print(ApIError.message);
+         emit(DrawImageErrorState(ApIError.message));
+       },);
+   }
   }
 
 
+  List<Map<String, dynamic>> results=[];
+
+  sendResults() {
+      emit(SendResultsLoadingState());
+      DioHelper.postData(
+          url: 'test/confirmation',
+          data: {
+            'test_id': testId.toString(),
+            'image_info': results.toString(),
+          },
+          onError: (ApIError) {
+            print(ApIError.message);
+            emit(SendResultsErrorState(ApIError.message));
+          },
+          onSuccess: (response) {
+            print(response.data);
+            // if (response.data['Status'] == "Success") {
+              emit(SendResultsSuccessState());
+            // }
+            // else
+            //   emit(SendResultsErrorState("TRY AGAIN"));
+          });
+  }
 
 }
