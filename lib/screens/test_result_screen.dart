@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_size_getter/image_size_getter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../shared/ast_cubit/cubit.dart';
@@ -12,9 +13,12 @@ import '../shared/components/components.dart';
 
 
 class TestResultScreen extends StatelessWidget {
+  const TestResultScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     var cubit = AppCubit.getCubit(context);
+    var label="";
     return BlocConsumer<AppCubit, States>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -63,10 +67,12 @@ class TestResultScreen extends StatelessWidget {
                                 ),
                                 child: Row(
                                   children: [
-                                    Text(cubit.images_info[index].new_label!),
+                                    // if((cubit.images_info[index].new_label)!=null)
+                                    //   Text(cubit.images_info[index].new_label!),
+                                    // if((cubit.images_info[index].new_label)==null)
+                                      Text(cubit.images_info[index].label!),
                                     Spacer(),
-                                    Text(cubit.interprateResults(
-                                        cubit.images_info[index].imgId!))
+                                    Text(cubit.images_info[index].result!)
                                   ],
                                 ),
                               ),
@@ -102,16 +108,22 @@ class TestResultScreen extends StatelessWidget {
   }
 
   createPdf(AppCubit cubit, context) async {
+
+    Size size=ImageSizeGetter.getSize(
+        MemoryInput(cubit.drawResultImg!));
+
     final PdfDocument document = PdfDocument();
+
+    final PdfBitmap image = PdfBitmap(cubit.drawResultImg!);
+
     final PdfPage page = document.pages.add();
     final PdfGrid grid = PdfGrid();
-    // final Uint8List imageData = File(cubit.image_path!).readAsBytesSync();
-    // final PdfBitmap image = PdfBitmap(imageData);
-    //
-    // document.pages
-    //     .add()
-    //     .graphics
-    //     .drawImage(image,  Rect.fromLTWH(0, 0, 480, 370));
+
+    document.pages
+        .add()
+        .graphics
+        .drawImage(image,  Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, size.height*(MediaQuery.of(context).size.width/size.width) ));
+
     grid.columns.add(count: 2);
     final PdfGridRow headerRow = grid.headers.add(1)[0];
     headerRow.cells[0].value = 'Antibiotic';
@@ -120,8 +132,11 @@ class TestResultScreen extends StatelessWidget {
         PdfStandardFont(PdfFontFamily.helvetica, 10, style: PdfFontStyle.bold);
     for (int i = 0; i < cubit.images_info.length; i++) {
       PdfGridRow row = grid.rows.add();
-      row.cells[0].value = cubit.images_info[i].new_label;
-      row.cells[1].value = 'S';
+      // if((cubit.images_info[i].new_label)!=null)
+      //   row.cells[0].value = cubit.images_info[i].new_label;
+      // else
+        row.cells[0].value = cubit.images_info[i].label;
+        row.cells[1].value = cubit.images_info[i].result;
     }
 
     grid.style.cellPadding = PdfPaddings(left: 5, top: 5);
