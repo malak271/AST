@@ -37,7 +37,7 @@ class DisplayPictureScreen extends StatelessWidget {
           body: Column(
             children: [
               SizedBox(height: 10,),
-              if (state is CropImageLoadingState)
+              if (state is CropImageLoadingState || state is NextState)
                 Expanded(
                   child: Column(
                     children: [
@@ -239,6 +239,7 @@ class DisplayPictureScreen extends StatelessWidget {
                   child: DefaultButton(
                       function: () {
                         cubit.drawImage(test_id: cubit.testId!);
+                        cubit.interpretResults();
                         navigateTo(context, DrawResultScreen());
                         // cubit.sendUserAdjustments();
                       },
@@ -407,7 +408,7 @@ class DisplayPictureScreen extends StatelessWidget {
           ),
           Slider(
             activeColor:  HexColor('40A76A'),
-            value: radius,
+            value: cubit.images_info[index].inhibitionRadius! * rScale ,
             min: 0.0,
             max: cubit.images_info[index].width ?? 0,
             onChanged: (value) {
