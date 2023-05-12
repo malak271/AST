@@ -15,14 +15,14 @@ class LoginCubit extends Cubit<LoginStates> {
   // String? cookie;
 
   void login({
-    required String username,
+    required String email,
     required String password,
   }) {
     emit(LoginLoadingState());
     DioHelper.postData(
         url: 'auth/login',
         data: {
-          'username': '$username',
+          'email': '$email',
           'password': '$password',
         },
         onError: (ApIError) {
