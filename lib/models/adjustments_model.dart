@@ -1,21 +1,18 @@
-class AdjustmentModel{
+class ResultModel{
   int? img_id;
-  String? label;
-  double? radius;
+  String? result;
 
-  AdjustmentModel({this.img_id, this.label, this.radius});
+  ResultModel({this.img_id, this.result});
 
-  AdjustmentModel.fromJson(Map<String, dynamic> json) {
-    img_id = json['"id"'];
-    label = json['"label"'];
-    radius = json['"radius"'];
-  }
+  // ResultModel.fromJson(Map<String, dynamic> json) {
+  //   img_id = json['id'];
+  //   result = json['label'];
+  // }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['"id"'] = this.img_id;
-    data['"label"'] = this.label;
-    data['"radius"'] = this.radius;
+    data['id'] = this.img_id;
+    data['result'] = this.result;
     return data;
   }
 }
