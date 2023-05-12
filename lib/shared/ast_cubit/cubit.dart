@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:ast/models/adjustments_model.dart';
 import 'package:ast/models/ast_model.dart';
 import 'package:ast/models/user_tests_model.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
@@ -8,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../network/remote/dio_helper.dart';
-import '../components/Constants.dart';
 
 class AppCubit extends Cubit<States> {
   AppCubit() : super(InitialState());
@@ -52,7 +50,6 @@ class AppCubit extends Cubit<States> {
           'file':await MultipartFile.fromFile(imagePath)
         },
         onError: (ApIError) {
-          print(ApIError.message);
           emit(CreateTestErrorState(ApIError.message));
         },
         onSuccess: (response)  {
@@ -72,8 +69,16 @@ class AppCubit extends Cubit<States> {
   }) {
     images_info.clear();
     numOfCrops=0;
-    diameters.clear();
-    labels.clear();
+    preLabels.clear();
+    List<String> c=['Cefepime/clavulanic acid FEC 40',
+      'Cefixime CFM 10',
+      'Cefditoren CDN 15',
+      'Cefmetazole CMZ 20',
+      'Cefepime/clavulanic acid FEC 50',
+      'Cefixime CFM 20',
+      'Cefditoren CDN 51',
+      'Cefmetazole CMZ 30'];
+    preLabels.addAll(c);
     emit(CropImageLoadingState());
     DioHelper.postData(
         url: 'process/crops',
@@ -98,6 +103,7 @@ class AppCubit extends Cubit<States> {
   }
 
  List<ASTModel> images_info=[];
+  List<String> preLabels = <String>[];
 
  getOneCroppedImage ({
     required int img_id,
@@ -112,6 +118,7 @@ class AppCubit extends Cubit<States> {
           'img_id':img_id,
         },
         onError: (ApIError) {
+          print(ApIError.message);
           emit(GetImgErrorState(ApIError.message));
         },
         onSuccess: (response) {
@@ -119,15 +126,14 @@ class AppCubit extends Cubit<States> {
           Uint8List imageBytes = Uint8List.fromList(response.data);
 
           Uint8List croppedImg = imageBytes ;
-
           if(croppedImg.isNotEmpty) {
             if(response.headers.value("atb-data") != null){
               Map<String, dynamic> data=json.decode(response.headers.value("atb-data")!);
               data['img']=croppedImg;
               images_info.add(ASTModel.fromJson(data));
+              preLabels.add(data['label']);
               if(images_info.length != images_id.length) {
                 print("-------------------------------------------------");
-                print(images_info.length-1);
                 emit(NextState(images_info.length));
               }
               if(images_info.length == images_id.length) {
@@ -144,9 +150,9 @@ class AppCubit extends Cubit<States> {
 
  sendUserAdjustments () {
 
-   print(labels);
-   print(diameters);
-   print(adjustments);
+   // print(labels);
+   // print(diameters);
+   // print(adjustments);
 
 
     if(adjustments.isNotEmpty) {
@@ -184,46 +190,71 @@ class AppCubit extends Cubit<States> {
 
   PageController controller = PageController(initialPage: 0);
 
-  List<String> labels = [];
-  List<double> diameters = [];
+  // List<String> labels = [];
+  // List<double> diameters=[];
 
   void changeSlider(index,value) {
-    diameters[index]=value;
 
-    int result =adjustments.indexWhere((element) => element['"id"'] == images_info[index].imgId);
-    print(result);
-    if(result >= 0){
-      adjustments[result]["\"radius\""]=diameters[index];
-    }else{
-      AdjustmentModel model=AdjustmentModel(radius:diameters[index] ,id: images_info[index].imgId);
-      adjustments.add(model.toJson());
-    }
+    images_info[index].inhibitionRadius=value;
 
+    // diameters[index]=value;
+    //
+    // int result =adjustments.indexWhere((element) => element['"id"'] == images_info[index].imgId);
+    // print(result);
+    // if(result >= 0){
+    //   adjustments[result]["\"radius\""]=diameters[index];
+    // }else{
+    //   AdjustmentModel model=AdjustmentModel(radius:diameters[index] ,img_id: images_info[index].imgId);
+    //   adjustments.add(model.toJson());
+    // }
+    //
     emit(ChangePageViewIndexState());
 
   }
 
   void changeLabel(index,value){
-    labels[index]=value;
-    print("$index,$value");
-    print(labels);
+
+    images_info[index].label=value;
+    print("$index,$value==============================");
 
     // adjustments.clear();
 
-    int result =adjustments.indexWhere((element) => element['"id"'] == images_info[index].imgId);
-    print("ressss $result");
-    if(result >= 0){
-      adjustments[result]["\"label\""]='"'+labels[index]+'"';
-    }else{
-      AdjustmentModel model=AdjustmentModel(label:'"'+labels[index]+'"' ,id: images_info[index].imgId);
-      adjustments.add(model.toJson());
-    }
+    // int result =adjustments.indexWhere((element) => element['"id"'] == images_info[index].imgId);
+    // print("ressss $result");
+    // if(result >= 0){
+    //   adjustments[result]["\"label\""]='"'+labels[index]+'"';
+    // }else{
+    //   AdjustmentModel model=AdjustmentModel(label:'"'+labels[index]+'"' ,img_id: images_info[index].imgId);
+    //   adjustments.add(model.toJson());
+    // }
 
     emit(ChangePageViewIndexState());
   }
 
-  bool isChecked = false;
+  Uint8List? drawResultImg;
+  void drawImage ({
+    required int test_id,
+  }) {
 
+    emit(DrawImageLoadingState());
+    DioHelper.postData(
+        url: 'fetch/draw',
+        data: {
+          'test_id': '$test_id',
+        },
+        onSuccess: (response)  {
+          var imageBytes = base64Decode(response.data);
+          if(imageBytes.isNotEmpty){
+            drawResultImg=imageBytes;
+            emit(DrawImageSuccessState());
+          }else
+            emit(DrawImageErrorState('The image id you provided doesn\'t match any stored image id'));
+        } ,
+      onError: (ApIError) {
+      print(ApIError.message);
+      emit(DrawImageErrorState(ApIError.message));
+    },);
+  }
 
 
 
