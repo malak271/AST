@@ -10,6 +10,8 @@ class ASTModel {
   double? width;
   double? height;
   Uint8List? img;
+  String? new_label;
+  double? new_inhibitionRadius;
 
   ASTModel(
       {this.imgId,
