@@ -11,7 +11,7 @@ import '../shared/login_cubit/login_states.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  var userNameController = TextEditingController();
+  var emailController = TextEditingController();
   var passwordController = TextEditingController();
   var formKey = GlobalKey<FormState>();
 
@@ -58,14 +58,14 @@ class LoginScreen extends StatelessWidget {
                             height: 30.h,
                           ),
                           DefaultTextFormField(
-                            controller: userNameController,
-                            type: TextInputType.text,
+                            controller: emailController,
+                            type: TextInputType.emailAddress,
                             validator: (String? value) {
                               if ((value ?? '').isEmpty) {
-                                return 'username must not be empty';
+                                return 'email must not be empty';
                               }
                             },
-                            text: 'user name',
+                            text: 'email',
                           ),
                           SizedBox(
                             height: 10.h,
@@ -92,7 +92,7 @@ class LoginScreen extends StatelessWidget {
                                       function: () {
                                         if (formKey.currentState!.validate()) {
                                           LoginCubit.get(context).login(
-                                              username: userNameController.text,
+                                              email: emailController.text,
                                               password: passwordController
                                                   .text);
                                         }

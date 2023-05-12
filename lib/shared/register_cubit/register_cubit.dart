@@ -25,8 +25,9 @@ class RegisterCubit extends Cubit<RegisterStates> {
           emit(RegisterErrorState(ApIError.message));
         },
         onSuccess: (response) {
-          if(response.data['Status']=="Failure")
+          if(response.data['Status']=="Failure") {
             emit(RegisterErrorState(response.data['Message']));
+          }else
           emit(RegisterSuccessState(response.data['Message']));
         });
   }
