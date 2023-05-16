@@ -58,7 +58,8 @@ class DrawResultScreen extends StatelessWidget {
                   Expanded(
                     child: DefaultButton(
                         function: () {
-                          cubit.sendResults();
+                          if(!cubit.resultReady)
+                             cubit.sendResults();
                           navigateTo(context, TestResultScreen());
                         },
                         text: 'NEXT'),
