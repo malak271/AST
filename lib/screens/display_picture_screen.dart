@@ -41,7 +41,7 @@ class DisplayPictureScreen extends StatelessWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      Image.file(File(cubit.image_path!)),
+                      // Image.file(File(cubit.image_path!)),
                       Expanded(
                           child: Container(
                               child:
@@ -215,10 +215,10 @@ class DisplayPictureScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child:
-            Image.file(File(cubit.image_path!))),
+            // ClipRRect(
+            //     borderRadius: BorderRadius.circular(10.0),
+            //     child:
+            // Image.file(File(cubit.image_path!))),
             SizedBox(height: 10,),
             Text(
                 'Has every antibiotic been identified?'),
