@@ -146,8 +146,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   // where it was saved.
                   final image = await controller.takePicture();
 
-                    CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path);
-print(croppedFile!.path);
+//                     CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path);
+// print(croppedFile!.path);
                     //     .cropImage(sourcePath: image.path, aspectRatioPresets: [
                     //   CropAspectRatioPreset.square,
                     //   CropAspectRatioPreset.ratio3x2,
