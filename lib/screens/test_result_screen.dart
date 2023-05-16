@@ -10,6 +10,7 @@ import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../shared/components/components.dart';
+import 'home_screen.dart';
 
 
 class TestResultScreen extends StatelessWidget {
@@ -70,7 +71,7 @@ class TestResultScreen extends StatelessWidget {
                                     // if((cubit.images_info[index].new_label)!=null)
                                     //   Text(cubit.images_info[index].new_label!),
                                     // if((cubit.images_info[index].new_label)==null)
-                                      Text(cubit.images_info[index].label!),
+                                    Text(cubit.images_info[index].label!),
                                     Spacer(),
                                     Text(cubit.images_info[index].result!)
                                   ],
@@ -96,7 +97,8 @@ class TestResultScreen extends StatelessWidget {
                   Expanded(
                     child: DefaultButton(
                         function: () {
-                          Navigator.pop(context);
+                          // Navigator.pop(context);
+                          navigateAndFinish(context, HomeScreen());
                         },
                         text: 'BACK'),
                   ),
@@ -108,22 +110,22 @@ class TestResultScreen extends StatelessWidget {
   }
 
   createPdf(AppCubit cubit, context) async {
-
-    Size size=ImageSizeGetter.getSize(
-        MemoryInput(cubit.drawResultImg!));
-
     final PdfDocument document = PdfDocument();
 
-    final PdfBitmap image = PdfBitmap(cubit.drawResultImg!);
+    if(cubit.drawResultImg!=null){
+      Size size=ImageSizeGetter.getSize(
+          MemoryInput(cubit.drawResultImg!));
+
+      final PdfBitmap image = PdfBitmap(cubit.drawResultImg!);
+
+      document.pages
+          .add()
+          .graphics
+          .drawImage(image,  Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, size.height*(MediaQuery.of(context).size.width/size.width) ));
+    }
 
     final PdfPage page = document.pages.add();
     final PdfGrid grid = PdfGrid();
-
-    document.pages
-        .add()
-        .graphics
-        .drawImage(image,  Rect.fromLTWH(0, 0, MediaQuery.of(context).size.width, size.height*(MediaQuery.of(context).size.width/size.width) ));
-
     grid.columns.add(count: 2);
     final PdfGridRow headerRow = grid.headers.add(1)[0];
     headerRow.cells[0].value = 'Antibiotic';
