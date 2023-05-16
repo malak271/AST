@@ -14,6 +14,8 @@ class AppCubit extends Cubit<States> {
 
   static AppCubit getCubit(context) => BlocProvider.of(context);
 
+  bool resultReady=false;
+
   UserTests? userTests;
   void getUserTests(){
     emit(GetTestsLoadingState());
@@ -190,7 +192,7 @@ class AppCubit extends Cubit<States> {
       if(element.inhibitionRadius! > 60)
         result='S';
       element.result=result;
-      ResultModel model=ResultModel(img_id:element.imgId,result:element.result);
+      ResultModel model=ResultModel(img_id:element.imgId,result:element.result,label:element.label);
       results.add(model.toJson());
     });
   }
@@ -253,8 +255,6 @@ class AppCubit extends Cubit<States> {
        onSuccess: (response) {
          var imageBytes = base64Decode(response.data);
 
-         // Uint8List imageBytes = Uint8List.fromList(response.data);
-
          if (imageBytes.isNotEmpty) {
            drawResultImg = imageBytes;
            emit(DrawImageSuccessState());
@@ -271,6 +271,7 @@ class AppCubit extends Cubit<States> {
 
 
   List<Map<String, dynamic>> results=[];
+
 
   sendResults() {
       emit(SendResultsLoadingState());

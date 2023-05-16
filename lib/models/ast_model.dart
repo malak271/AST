@@ -34,6 +34,7 @@ class ASTModel {
     width = json['width'];
     height = json['height'];
     img = json['img'];
+    result = json['result'];
   }
 
   Map<String, dynamic> toJson() {
