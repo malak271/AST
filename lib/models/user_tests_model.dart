@@ -30,8 +30,9 @@ class Data {
   int? id;
   String? img;
   String? sampleType;
-  String? userAdjustments;
   int? userId;
+  String? mobileResult;
+  String? processedImage;
 
   Data(
       {this.bacteria,
@@ -39,8 +40,10 @@ class Data {
         this.id,
         this.img,
         this.sampleType,
-        this.userAdjustments,
-        this.userId});
+        this.userId,
+        this.mobileResult,
+        this.processedImage
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     bacteria = json['bacteria'];
@@ -48,8 +51,9 @@ class Data {
     id = json['id'];
     img = json['img'];
     sampleType = json['sample_type'];
-    userAdjustments = json['user_adjustments'];
     userId = json['user_id'];
+    mobileResult = json['mobile_result'];
+    processedImage = json['processed_image'];
   }
 
   Map<String, dynamic> toJson() {
@@ -59,8 +63,9 @@ class Data {
     data['id'] = this.id;
     data['img'] = this.img;
     data['sample_type'] = this.sampleType;
-    data['user_adjustments'] = this.userAdjustments;
     data['user_id'] = this.userId;
+    data['mobile_result'] = this.mobileResult;
+    data['processed_image'] = this.processedImage;
     return data;
   }
 }
