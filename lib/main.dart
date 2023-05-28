@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:ast/screens/home_screen.dart';
 import 'package:ast/screens/login_screen.dart';
 import 'package:ast/shared/ast_cubit/cubit.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
@@ -20,23 +21,17 @@ void main() async{
   HttpOverrides.global = MyHttpOverrides();
 
   cameras =await availableCameras();
+
   await CacheHelper.init();
-  // cookie=CacheHelper.getData(key:'cookie');
-  // bool? isBoarding = CacheHelper.getData(key: 'onBoarding');
+  cookie=CacheHelper.getData(key:'cookie');
 
   Widget? widget;
-  widget=LoginScreen();
-  // if(isBoarding != null){
-  //   if(cookie != null){
-  //     widget=HomeScreen();
-  //   }else{
-  //     widget=LoginScreen();
-  //   }
-  // }
-  // else{
-  //   OnBoarding();
-  // }
 
+    if(cookie != null){
+      widget=HomeScreen();
+    }else{
+      widget=LoginScreen();
+    }
 
   Bloc.observer = MyBlocObserver();
 
