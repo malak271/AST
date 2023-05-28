@@ -1,10 +1,10 @@
 import 'package:ast/screens/register_screen.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hexcolor/hexcolor.dart';
 import '../../../shared/components/components.dart';
 import '../shared/login_cubit/login_cubit.dart';
 import '../shared/login_cubit/login_states.dart';
@@ -38,7 +38,7 @@ class LoginScreen extends StatelessWidget {
         },
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: HexColor("ede3ca"),
+            backgroundColor: Colors.white,
               body: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Center(
@@ -48,13 +48,13 @@ class LoginScreen extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Image(
-                            image: AssetImage('assets/images/logo.jpeg'),
+                          Image.asset(
+                              'assets/images/logo700.png',
                             fit: BoxFit.cover,
+                            width: 230,
+                            height: 230,
                           ),
-                          SizedBox(
-                            height: 30.h,
-                          ),
+                          SizedBox(height: 10,),
                           DefaultTextFormField(
                             controller: emailController,
                             type: TextInputType.emailAddress,
@@ -64,10 +64,9 @@ class LoginScreen extends StatelessWidget {
                               }
                             },
                             text: 'email',
+                            prefix: Icons.email
                           ),
-                          SizedBox(
-                            height: 10.h,
-                          ),
+                          mySizedBox,
                           DefaultTextFormField(
                             controller: passwordController,
                             type: TextInputType.text,
@@ -78,6 +77,7 @@ class LoginScreen extends StatelessWidget {
                               }
                             },
                             text: 'password',
+                              prefix: Icons.lock
                           ),
                           SizedBox(
                             height: 5.h,
@@ -98,9 +98,7 @@ class LoginScreen extends StatelessWidget {
                                       text: 'login'),
                               fallback: (context) =>
                                   Center(child: CircularProgressIndicator())),
-                          SizedBox(
-                            height: 10.h,
-                          ),
+                          mySizedBox,
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

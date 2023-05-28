@@ -90,7 +90,7 @@ class MyColor{
     return HexColor('40A76A');
   }
   static getBackGroundColor(){
-    return HexColor('FAFAFA');
+    return Colors.white;
   }
 }
 

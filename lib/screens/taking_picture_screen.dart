@@ -1,13 +1,12 @@
-import 'dart:io';
-
+import 'package:audioplayers/audioplayers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_cropper/image_cropper.dart';
-
 import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
 import '../shared/components/Constants.dart';
+import '../shared/components/components.dart';
+import 'display_picture_screen.dart';
 
 class TakePictureScreen extends StatefulWidget {
   const TakePictureScreen({
@@ -58,33 +57,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
         child: BlocConsumer<AppCubit, States>(
           listener: (context, state) async {
-            // if(state is UploadImgSuccessState){
-            //   print("========================================");
-            //   await Navigator.of(context).push(
-            //     MaterialPageRoute(
-            //       builder: (context) => DisplayPictureScreen(
-            //         // Pass the automatically generated path to
-            //         // the DisplayPictureScreen widget.
-            //         //   imagePath: state.imagePath,
-            //           // astModel:state.astModel
-            //       ),
-            //     ),
-            //   );
-            // }
-            // if(state is CreateTestSuccessState){
-            //   print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-            //   Fluttertoast.showToast(
-            //     msg: "Insertion was successful",
-            //     toastLength: Toast.LENGTH_LONG,
-            //     gravity: ToastGravity.BOTTOM,
-            //     timeInSecForIosWeb: 1,
-            //     fontSize: 16,
-            //     backgroundColor: Colors.green,
-            //     textColor: Colors.white,
-            //   );
-            //   cubit.cropImage(test_id: cubit.testId!);
-            //   navigateTo(context, DisplayPictureScreen());
-            // }
+            if (state is CreateTestSuccessState) {
+              cubit.cropImage(test_id: cubit.testId!);
+              navigateTo(context, DisplayPictureScreen());
+            }
           },
           builder: (context, state) => Scaffold(
             backgroundColor: Colors.black,
@@ -103,7 +79,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                             border:
                                 Border.all(color: Colors.white, width: 1.5)),
                       )),
-                  Positioned.fill(
+                Positioned.fill(
                     child: Align(
                         alignment: Alignment.center,
                         child: Container(
@@ -133,6 +109,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             floatingActionButton: FloatingActionButton(
               // Provide an onPressed callback.
               onPressed: () async {
+                AudioPlayer().play(AssetSource('audio/capture.mp3'));
+
                 setState(() {
                   text = "Taking photo...";
                 });
@@ -148,29 +126,29 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
 //                     CroppedFile? croppedFile = await ImageCropper().cropImage(sourcePath: image.path);
 // print(croppedFile!.path);
-                    //     .cropImage(sourcePath: image.path, aspectRatioPresets: [
-                    //   CropAspectRatioPreset.square,
-                    //   CropAspectRatioPreset.ratio3x2,
-                    //   CropAspectRatioPreset.original,
-                    //   CropAspectRatioPreset.ratio4x3,
-                    //   CropAspectRatioPreset.ratio16x9
-                    // ], uiSettings: [
-                    //   AndroidUiSettings(
-                    //       toolbarTitle: 'Cropper',
-                    //       toolbarColor: Colors.deepOrange,
-                    //       toolbarWidgetColor: Colors.white,
-                    //       initAspectRatio: CropAspectRatioPreset.original,
-                    //       lockAspectRatio: false),
-                    //   IOSUiSettings(
-                    //     minimumAspectRatio: 1.0,
-                    //   )
-                    // ]);
+                  //     .cropImage(sourcePath: image.path, aspectRatioPresets: [
+                  //   CropAspectRatioPreset.square,
+                  //   CropAspectRatioPreset.ratio3x2,
+                  //   CropAspectRatioPreset.original,
+                  //   CropAspectRatioPreset.ratio4x3,
+                  //   CropAspectRatioPreset.ratio16x9
+                  // ], uiSettings: [
+                  //   AndroidUiSettings(
+                  //       toolbarTitle: 'Cropper',
+                  //       toolbarColor: Colors.deepOrange,
+                  //       toolbarWidgetColor: Colors.white,
+                  //       initAspectRatio: CropAspectRatioPreset.original,
+                  //       lockAspectRatio: false),
+                  //   IOSUiSettings(
+                  //     minimumAspectRatio: 1.0,
+                  //   )
+                  // ]);
 
-                    cubit.image_path = image.path;
-                    AppCubit.getCubit(context).createNewTest(
-                        bacteria: cubit.bacteria!,
-                        sample_type: cubit.sampleType!,
-                        imagePath: image.path);
+                  cubit.image_path = image.path;
+                  AppCubit.getCubit(context).createNewTest(
+                      bacteria: cubit.bacteria!,
+                      sample_type: cubit.sampleType!,
+                      imagePath: image.path);
 
                   if (!mounted) return;
                 } catch (e) {
