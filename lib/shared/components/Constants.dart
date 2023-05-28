@@ -3,26 +3,44 @@ import 'package:flutter/material.dart';
 
 var  cameras;
 
-String UPLOAD= "http://localhost:8000/api/upload";
+const LOGIN='auth/login';
+
+const SIGNUP='auth/signup';
+
+const USER_TESTS='user/tests';
+
+const CREATE_TEST='test/create';
+
+const PROCESS_CROP='process/crops';
+
+const FETCH_CROP='fetch/crop';
+
+const FETCH_DRAW='fetch/draw';
+
+const TEST_CONFIRM='test/confirmation';
 
 String? cookie;
 
-BoxDecoration DECORATION=BoxDecoration(
+BoxDecoration CARD_DECORATION=BoxDecoration(
   color: Colors.white,
   borderRadius: BorderRadius.circular(10),
   boxShadow: [
     BoxShadow(
-      color: Colors.grey.withOpacity(0.5),
+      color: Colors.grey.withOpacity(0.1),
       spreadRadius: 5,
       blurRadius: 7,
-      offset: Offset(0, 3), // changes position of shadow
+      offset: Offset(0, 2),
     ),
   ],
 );
 
-SizedBox SIZEDBOX20=SizedBox(height: 20,);
+InputDecoration dropdownButtonDecoration=const InputDecoration(
+border: OutlineInputBorder(
+borderSide: BorderSide(color: Colors.green,width: 1)
+),
+contentPadding: EdgeInsets.all(4),
+focusedBorder:  OutlineInputBorder(
+borderSide: BorderSide(color: Colors.green,width: 1)
+),
+);
 
-void printFullText(String text){
-  final pattern =RegExp('.{1,800}');
-  pattern.allMatches(text).forEach((match)=>print(match.group(0)));
-}

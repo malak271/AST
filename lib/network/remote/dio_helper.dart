@@ -1,12 +1,11 @@
 import 'dart:io';
-
 import 'package:ast/shared/components/Constants.dart';
 import 'package:dio/dio.dart';
 
 class DioHelper {
 
   static  Dio dio = Dio(BaseOptions(
-      baseUrl: 'http://192.168.1.105:5000/',
+      baseUrl: 'http://192.168.1.110:5000/',
       receiveDataWhenStatusError: true,
       headers:
       {
@@ -14,7 +13,7 @@ class DioHelper {
         'cookie':cookie
       },
     followRedirects: false,
-    maxRedirects: 5, // adjust this to suit your needs
+    maxRedirects: 5,
   ));
 
 
@@ -68,15 +67,11 @@ class DioHelper {
     dio.options.maxRedirects=5;
     dio.options.validateStatus=(status) { return (status??200) < 500; };
 
-    // followRedirects: true,
-    // maxRedirects: 5,
     try {
+
       //formdata
       var formData = FormData.fromMap(data);
       Response response = await dio.post(url, data: formData ,options:options );
-      //raw
-      // print('url post : $url');
-      // Response response = await dio.post(url,queryParameters: query,data: data);
       onSuccess(response);
 
     }on DioError catch(error){

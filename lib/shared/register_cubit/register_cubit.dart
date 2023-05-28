@@ -1,3 +1,4 @@
+import 'package:ast/shared/components/Constants.dart';
 import 'package:ast/shared/register_cubit/register_states.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../network/remote/dio_helper.dart';
@@ -14,7 +15,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
   }) async{
     emit(RegisterLoadingState());
     DioHelper.postData(
-        url: 'auth/signup',
+        url: SIGNUP,
         data: {
           'email':'$email',
           'username':'$username',

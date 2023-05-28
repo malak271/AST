@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 abstract class RegisterStates{}
 
 class RegisterInitialState extends RegisterStates{}
