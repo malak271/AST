@@ -75,3 +75,5 @@ class SendResultsErrorState extends States{
   final error;
   SendResultsErrorState(this.error);
 }
+
+class SearchState extends States{}
