@@ -60,10 +60,15 @@ dependencies:
   syncfusion_flutter_pdf:
   permission_handler:
   image_cropper: ^3.0.3
+  excel:
+  flutter_dropdown_search:
+  dropdown_text_search:
+  animated_text_kit:
+  audioplayers:
 
 flutter_native_splash:
-  color: "#ede3ca"
-  image: assets/images/logo1.png
+  color: "#ffffff"
+  image: assets/images/logo700.png
   fill: false
   android: true
   ios: true
@@ -94,6 +99,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/
+     - assets/listofbacteria.xlsx
+     - assets/Listofspecimens.xlsx
+     - assets/audio/
 #     - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
