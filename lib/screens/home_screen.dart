@@ -1,17 +1,16 @@
 import 'dart:convert';
-
-import 'package:ast/models/adjustments_model.dart';
 import 'package:ast/screens/add_new_test_screen.dart';
 import 'package:ast/screens/draw_result_screen.dart';
-import 'package:ast/screens/test_result_screen.dart';
+import 'package:ast/screens/login_screen.dart';
 import 'package:ast/shared/ast_cubit/cubit.dart';
+import 'package:ast/styles/theme.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hexcolor/hexcolor.dart';
 import '../models/ast_model.dart';
 import '../models/user_tests_model.dart';
 import '../shared/ast_cubit/states.dart';
+import '../shared/components/Constants.dart';
 import '../shared/components/components.dart';
 import 'display_picture_screen.dart';
 
@@ -21,26 +20,35 @@ class HomeScreen extends StatelessWidget {
     var cubit = AppCubit.getCubit(context);
     cubit.getUserTests();
     return Scaffold(
-        backgroundColor: HexColor("ede3ca"),
+        backgroundColor: MyColor.getBackGroundColor(),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
+            cubit.loadExcelData();
             navigateTo(context, NewTest());
           },
           icon: const Icon(Icons.edit),
           label: const Text('New Test'),
-          backgroundColor: HexColor('40A76A'),
+          backgroundColor: MyColor.getColor(),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         appBar: AppBar(
-          backgroundColor: HexColor('40A76A'),
+          backgroundColor: MyColor.getColor(),
           titleSpacing: 0,
           title: Text('My Tests:'),
           leading: Icon(Icons.arrow_back_ios_outlined),
+          actions: [
+            GestureDetector(child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.logout,size: 35,),
+            ),onTap: (){
+              cookie=null;
+              navigateAndFinish(context, LoginScreen());
+            },)
+          ],
         ),
         body: BlocConsumer<AppCubit, States>(
           listener: (context, state) => {},
           builder: (context, state) {
-            // var cubit = AppCubit.getCubit(context);
             return ConditionalBuilder(
               builder: (BuildContext context) {
                 return Padding(
@@ -56,13 +64,15 @@ class HomeScreen extends StatelessWidget {
         ));
   }
 
-  Widget itemBuilder(context, AppCubit cubit) => SingleChildScrollView(
+  Widget itemBuilder(context, AppCubit cubit) {
+    if(cubit.userTests!.testsCount ==0 )
+      return const Center(child: Text('There are no tests yet.'),);
+    return SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListView.separated(
                   shrinkWrap: true,
@@ -70,74 +80,37 @@ class HomeScreen extends StatelessWidget {
                   scrollDirection: Axis.vertical,
                   itemBuilder: (context, index) => buildCardItem(
                       cubit.userTests!.data![index], context, cubit),
-                  separatorBuilder: (context, index) => SizedBox(
-                        height: 10,
-                      ),
+                  separatorBuilder: (context, index) => mySizedBox,
                   itemCount: cubit.userTests!.testsCount ?? 0),
-              SizedBox(
-                height: 20,
-              ),
+              mySizedBox20,
             ],
           ),
         ),
       );
 
+  }
+
   Widget buildCardItem(Data test, context, AppCubit cubit) => GestureDetector(
         child: Container(
           padding: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
+          decoration: CARD_DECORATION,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              buildRowItem('Sample type: ',test.sampleType),
+              buildRowItem('Bacteria:  ', test.bacteria),
+              buildRowItem('Created at: ', test.createdAt,maxLines: 2),
               Row(
                 children: [
-                  Text(
-                    'Sample type: ${test.sampleType}',
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(),
-                  ),
-                  Spacer(),
                   Icon(
                     test.mobileResult != null
                         ? Icons.check_box
-                        : Icons.play_circle_fill_sharp,
-                    color:test.mobileResult!=null? Colors.green:Colors.red,
+                        : Icons.timelapse_outlined,
+                    color:test.mobileResult!=null? Colors.green:Colors.blue,
                   ),
+                  Text(
+                      ' ${test.mobileResult != null ? 'completed' : 'not completed'}',style: TextStyle(color: Colors.black54,fontSize: 12),)
                 ],
-              ),
-              Text(
-                'Bacteria: ${test.bacteria}',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(),
-              ),
-              Text(
-                'Created at: ${test.createdAt}',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(),
-              ),
-              Text(
-                'Status: ${test.mobileResult != null ? 'Completed' : 'Not Completed'}',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(),
               ),
             ],
           ),
@@ -155,12 +128,25 @@ class HomeScreen extends StatelessWidget {
               cubit.resultReady=true;
               navigateTo(context, DrawResultScreen());
             }
-            else
-            navigateTo(context, TestResultScreen());
-          }else{
+            // else
+            // navigateTo(context, TestResultScreen());
+          }else  if (test.mobileResult == null) {
              cubit.cropImage(test_id: cubit.testId!);
              navigateTo(context, DisplayPictureScreen());
           }
         },
       );
+
+  Widget buildRowItem(title,text,{maxLines=1})=>Row(
+    children: [
+      Text(title,style: TextStyle(fontWeight: FontWeight.w500,fontSize: 12),),
+      Text(
+        '$text',
+        textAlign: TextAlign.center,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 12),
+      ),
+    ],
+  );
 }
