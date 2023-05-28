@@ -1,6 +1,6 @@
 # ast
 
-A new Flutter project.
+A Flutter Application for Automated Disk Diffusion Antimicrobial Susceptibility Testing
 
 ## Getting Started
 
