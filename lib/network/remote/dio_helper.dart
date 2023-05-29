@@ -30,6 +30,7 @@ class DioHelper {
     required Function(ApIError) onError,
   }) async {
     try{
+      print(cookie);
       dio.options.headers= {
         'Content-Type':'application/json',
         'cookie':cookie

@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
               toastLength: Toast.LENGTH_LONG,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
-              fontSize: 16,
+              fontSize: 16.sp,
               backgroundColor: Colors.red,
               textColor: Colors.white,
             );
@@ -51,10 +51,10 @@ class LoginScreen extends StatelessWidget {
                           Image.asset(
                               'assets/images/logo700.png',
                             fit: BoxFit.cover,
-                            width: 230,
-                            height: 230,
+                            width: 230.w,
+                            height: 230.h,
                           ),
-                          SizedBox(height: 10,),
+                          SizedBox(height: 10.h,),
                           DefaultTextFormField(
                             controller: emailController,
                             type: TextInputType.emailAddress,
@@ -102,7 +102,7 @@ class LoginScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text('Don\'t have an account?'),
+                              Text('Don\'t have an account?',style: TextStyle(fontSize: 12.sp),),
                               TextButton(
                                   onPressed: () {
                                     navigateTo(context, RegisterScreen());

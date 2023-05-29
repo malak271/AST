@@ -1,5 +1,6 @@
 import 'package:ast/styles/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 Widget DefaultButton({
@@ -99,20 +100,22 @@ void navigateAndFinish(context, widget) {
 }
 
 SizedBox mySizedBox = SizedBox(
-  height: 10,
+  height: 10.h,
 );
 
 SizedBox mySizedBox20 = SizedBox(
-  height: 20,
+  height: 20.h,
 );
 
-Widget myMaterialButton(text,IconData icon, {required Function function}) => Container(
+Widget myMaterialButton(text,IconData icon,{required Function function}) => Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5.0),
         color: MyColor.getColor(),
       ),
       child: MaterialButton(
-        onPressed: function(),
+        onPressed:(){
+          function();
+        },
         child: Row(
           children: [
             Icon(

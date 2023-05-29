@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
         listener: (BuildContext context, state) {  },
         builder: (BuildContext context, Object? state) {
           return ScreenUtilInit(
-            designSize: const Size(360, 690),
+            designSize: const Size(393, 851),
             builder:(context,child)=> MaterialApp(
               // theme: MyLightTheme.getTheme(),
               // darkTheme: darkTheme,

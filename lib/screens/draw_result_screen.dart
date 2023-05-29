@@ -4,6 +4,7 @@ import 'package:ast/screens/home_screen.dart';
 import 'package:ast/styles/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
 import '../shared/components/components.dart';
@@ -78,7 +79,7 @@ class _DrawResultScreenState extends State<DrawResultScreen> {
                             ),
                           ),
                           Positioned(
-                            top: 185,
+                            top: 185.h,
                             child: Visibility(
                               child: Container(width: MediaQuery.of(context).size.width,padding:EdgeInsets.all(8),color: Colors.grey.withOpacity(.5),child: Text("You can Zoom in and out ",textAlign: TextAlign.center,style: TextStyle(color: Colors.white),)), //Your widget is gone and won't take up space
                               visible: isVisible,
@@ -99,7 +100,7 @@ class _DrawResultScreenState extends State<DrawResultScreen> {
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: Colors.grey,
-                                  width: 1.0,
+                                  width: 1,
                                 ),
                               ),
                               child: Row(
@@ -135,7 +136,7 @@ class _DrawResultScreenState extends State<DrawResultScreen> {
     decoration: BoxDecoration(
       border: Border.all(
         color: Colors.grey,
-        width: 1.0,
+        width: 1,
       ),
     ),
     child: Text(

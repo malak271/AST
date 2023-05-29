@@ -1,10 +1,13 @@
 import 'dart:io';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:ast/screens/add_new_test_screen.dart';
 import 'package:ast/screens/draw_result_screen.dart';
 import 'package:ast/styles/theme.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 import '../shared/ast_cubit/cubit.dart';
 import '../shared/ast_cubit/states.dart';
@@ -35,85 +38,94 @@ class DisplayPictureScreen extends StatelessWidget {
           title: const Text('Result'),
           backgroundColor: MyColor.getColor(),
         ),
-        bottomNavigationBar: Container(
-          color: Colors.grey.withOpacity(.8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Colors.black54,
-                ),
-                onPressed: () {
-                  if (AppCubit.getCubit(context).controller.page!.toInt() > 0) {
-                    AppCubit.getCubit(context).controller.previousPage(
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                  }
-                },
-              ),
-              Divider(color: Colors.white),
-              IconButton(
-                icon: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.black54,
-                ),
-                onPressed: () {
-                  if (cubit.controller.page!.toInt() <
-                      cubit.images_info.length - 1) {
-                    AppCubit.getCubit(context).controller.nextPage(
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                  } else if (cubit.controller.page!.toInt() ==
-                      cubit.images_info.length - 1) {
-                    AudioPlayer().play(AssetSource('audio/pop.mp3'));
-                    AlertDialog alert = AlertDialog(
-                      content: Text(
-                          'Tap finish if everything looks good, or cancel'),
-                      actions: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DefaultButton(
-                                  function: () {
-                                    cubit.drawImage(test_id: cubit.testId!);
-                                    cubit.interpretResults();
-                                    cubit.sendResults();
-                                    navigateAndFinish(
-                                        context, DrawResultScreen());
-                                  },
-                                  text: 'finish ',
-                                  icon: Icons.done),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: DefaultButton(
-                                  function: () {
-                                    Navigator.pop(context);
-                                  },
-                                  text: 'cancel ',
-                                  icon: Icons.cancel),
+        bottomNavigationBar: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if( state is CropImageErrorState)
+              DefaultButton(function: (){navigateAndFinish(context, NewTest());}, text: 'BACK'),
+            if(state is! CropImageErrorState)
+            Container(
+              color: Colors.grey.withOpacity(.8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      if (AppCubit.getCubit(context).controller.page!.toInt() > 0) {
+                        AppCubit.getCubit(context).controller.previousPage(
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                      }
+                    },
+                  ),
+                  Divider(color: Colors.white),
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      if (cubit.controller.page!.toInt() <
+                          cubit.images_info.length - 1) {
+                        AppCubit.getCubit(context).controller.nextPage(
+                              duration: Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                      } else if (cubit.controller.page!.toInt() ==
+                          cubit.images_info.length - 1) {
+                        AudioPlayer().play(AssetSource('audio/pop.mp3'));
+                        AlertDialog alert = AlertDialog(
+                          content: Text(
+                              'Tap finish if everything looks good, or cancel'),
+                          actions: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DefaultButton(
+                                      function: () {
+                                        cubit.drawImage(test_id: cubit.testId!);
+                                        cubit.interpretResults();
+                                        cubit.sendResults();
+                                        navigateAndFinish(
+                                            context, DrawResultScreen());
+                                      },
+                                      text: 'finish ',
+                                      icon: Icons.done),
+                                ),
+                                SizedBox(
+                                  width: 10.w,
+                                ),
+                                Expanded(
+                                  child: DefaultButton(
+                                      function: () {
+                                        Navigator.pop(context);
+                                      },
+                                      text: 'cancel ',
+                                      icon: Icons.cancel),
+                                ),
+                              ],
                             ),
                           ],
-                        ),
-                      ],
-                    );
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return alert;
-                      },
-                    );
-                  }
-                },
+                        );
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return alert;
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         body: Column(
           children: [
@@ -124,18 +136,28 @@ class DisplayPictureScreen extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    Expanded(
-                      child: PageView.builder(
-                        controller: cubit.controller,
-                        itemCount: cubit.numOfCrops,
-                        itemBuilder: (BuildContext context, int index)=>imgPage(cubit, index, context),
-                        onPageChanged: (index) {},
-                        physics: BouncingScrollPhysics(),
+                    ConditionalBuilder(
+                      condition:cubit.numOfCrops>0 ,
+                      fallback:(BuildContext context)
+                           {
+                             navigateAndFinish(context, NewTest());
+                             return Text('No antibiotics founded.');
+                           } ,
+                      builder:(BuildContext context)=> Expanded(
+                        child: PageView.builder(
+                          controller: cubit.controller,
+                          itemCount: cubit.numOfCrops,
+                          itemBuilder: (BuildContext context, int index)=>imgPage(cubit, index, context),
+                          onPageChanged: (index) {},
+                          physics: BouncingScrollPhysics(),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+            if( state is CropImageErrorState)
+               Center(child: Text('No antibiotics founded.'))
           ],
         ),
       );
@@ -144,9 +166,9 @@ class DisplayPictureScreen extends StatelessWidget {
 
   Widget LoadingPage(cubit) => Column(
         children: [
-          Image.file(File(cubit.image_path!)),
+          Container(height:400.h,width:double.infinity,child: Image.file(File(cubit.image_path!),fit: BoxFit.cover,)),
           SizedBox(
-            height: 190,
+            height: 20.h,
           ),
           AnimatedTextKit(
             animatedTexts: [
@@ -161,9 +183,9 @@ class DisplayPictureScreen extends StatelessWidget {
     Size size =
         ImageSizeGetter.getSize(MemoryInput(cubit.images_info[index].img!));
 
-    double xScale = ((400.0) / (cubit.images_info[index].width!));
+    double xScale = ((400.0.w) / (cubit.images_info[index].width!));
 
-    double yScale = ((400.0) / (cubit.images_info[index].height!));
+    double yScale = ((400.0.h) / (cubit.images_info[index].height!));
 
     double rScale = (xScale + yScale) / 2;
 
@@ -176,8 +198,8 @@ class DisplayPictureScreen extends StatelessWidget {
           Stack(
             children: [
               Container(
-                height: 400,
-                width: 400,
+                height: 400.h,
+                width: 400.w,
                 child: Image.memory(
                   cubit.images_info[index].img!,
                   fit: BoxFit.cover,
@@ -216,7 +238,7 @@ class DisplayPictureScreen extends StatelessWidget {
               onChanged: (String? value) {
                 cubit.changeLabel(index, value);
               },
-              menuMaxHeight: 300,
+              menuMaxHeight: 300.h,
               items:
                   cubit.preLabels.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
@@ -243,7 +265,7 @@ class DisplayPictureScreen extends StatelessWidget {
                 },
               ),
               Container(
-                width: 250,
+                width: 250.w,
                 child: Slider(
                   activeColor: MyColor.getColor(),
                   value: cubit.images_info[index].inhibitionRadius!,
@@ -269,10 +291,10 @@ class DisplayPictureScreen extends StatelessWidget {
   }
 
   Widget sliderButton(IconData icon, Function function) => GestureDetector(
-        onTap: function(),
+        onTap: (){function();},
         child: Container(
-          height: 40,
-          width: 40,
+          height: 40.h,
+          width: 40.w,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
             border: Border.all(color: MyColor.getColor()),
