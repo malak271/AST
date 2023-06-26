@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:ast/models/ast_model.dart';
+import 'package:ast/models/standard_results.dart';
 import 'package:ast/models/user_tests_model.dart';
 import 'package:ast/shared/ast_cubit/states.dart';
 import 'package:dio/dio.dart';
@@ -178,8 +179,16 @@ class AppCubit extends Cubit<States> {
 
   interpretResults() {
     images_info.forEach((element) {
-      var result = 'S';
-      if (element.inhibitionRadius! > 60) result = 'R';
+      var result = 'not found';
+      StandardModel searchResult = excelResults.firstWhere((item) => item.symbol == element.label);
+
+      if(element.inhibitionRadius==searchResult.sensitive)
+        result='S';
+      else if(element.inhibitionRadius==searchResult.resistant)
+        result='R';
+      else if(element.inhibitionRadius!>=(searchResult.greaterIntermediate!) && element.inhibitionRadius!<=(searchResult.lessIntermediate! ) )
+      result='R';
+
       element.result = result;
       ResultModel model = ResultModel(
           img_id: element.imgId, result: element.result, label: element.label);
@@ -287,6 +296,25 @@ class AppCubit extends Cubit<States> {
     cb(excelData);
   }
 
+  List<StandardModel> excelResults = [];
+  readResultsExcel(cb) async {
+    ByteData data = await rootBundle.load('assets/results.xlsx');
+    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    var excel = Excel.decodeBytes(bytes);
+    List<StandardModel> excelData = [];
+
+    for (var table in excel.tables.keys) {
+      for (var row in excel.tables[table]!.rows) {
+        String value = await row[2]!.value;
+        List<String> numbers = value.split('–');
+        StandardModel model=StandardModel(await row[0]!.value,await row[1]!.value,int.parse(numbers[0]),int.parse(numbers[1]),await row[3]!.value);
+        excelData.add(model);
+      }
+    }
+
+    cb(excelData);
+  }
+
   loadExcelData() async {
 
     await readBacteriaExcel((data) {
@@ -295,6 +323,10 @@ class AppCubit extends Cubit<States> {
 
     await readSamplesExcel((data) {
       excelDataSamples = data;
+    });
+
+    await readResultsExcel((data) {
+      excelResults = data;
     });
 
     emit(SearchState());
